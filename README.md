@@ -57,6 +57,36 @@ Requires JDK 17 or 21 and the Android SDK (compileSdk 35).
 ./gradlew assembleDebug testDebugUnitTest
 ```
 
+## Releases
+
+Pushing a version tag publishes a signed APK as a GitHub Release
+([`release.yml`](.github/workflows/release.yml)):
+
+```bash
+git tag v2.0.0 && git push origin v2.0.0
+```
+
+The tag must point at a commit on `master`. Tags with a suffix (`v2.1.0-beta.1`) become pre-releases.
+The version name comes from the tag; the version code from the workflow run number.
+
+One-time setup: create an upload keystore and keep it somewhere safe (losing it means
+users can't update over existing installs).
+
+```bash
+keytool -genkeypair -v -keystore beathub-release.jks -alias beathub -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Then add these repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+| --- | --- |
+| `KEYSTORE_BASE64` | `base64 -w0 beathub-release.jks` |
+| `KEYSTORE_PASSWORD` | the keystore password |
+| `KEY_ALIAS` | `beathub` (or the alias you chose) |
+| `KEY_PASSWORD` | the key password |
+
+Local `assembleRelease` builds still work without these; they're just unsigned.
+
 ## Roadmap
 
 - README screenshots
